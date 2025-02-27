@@ -1,27 +1,23 @@
 <?php
-// Vista para crear un nuevo usuario
+// views/users/create.php
+// Vista para el formulario de creación de un nuevo usuario
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
     <title>Crear Usuario</title>
 </head>
 <body>
     <h1>Crear Usuario</h1>
-    <form action="index.php?action=store" method="post">
-        <p>
-            <label for="name">Nombre:</label>
-            <input type="text" name="name" required>
-        </p>
-        <p>
-            <label for="email">Email:</label>
-            <input type="email" name="email" required>
-        </p>
-        <p>
-            <button type="submit">Crear</button>
-        </p>
+    <form action="/users/store" method="post">
+        <label>Nombre:</label>
+        <input type="text" name="name" required>
+        <br>
+        <label>Email:</label>
+        <input type="email" name="email" required>
+        <br>
+        <button type="submit">Crear</button>
     </form>
-    <a href="index.php?action=index">Volver</a>
+    <a href="/users">Volver a la lista</a>
 </body>
 </html>

@@ -1,39 +1,41 @@
 <?php
-// Archivo de rutas: define las acciones basadas en el parámetro GET 'action'
+// routes.php
+// Definición de las rutas de la aplicación
 
-// Incluir la configuración de la base de datos y las clases necesarias
-require_once 'config/database.php';
-require_once 'models/User.php';
 require_once 'controllers/UserController.php';
 
-// Obtener la acción desde la URL, por defecto se listan los usuarios
-$action = isset($_GET['action']) ? $_GET['action'] : 'index';
+function route($url) {
+    $uri = parse_url($url, PHP_URL_PATH);
 
-// Instanciar el controlador de usuarios
-$controller = new UserController();
-
-// Despachar la acción solicitada
-switch($action) {
-    case 'index':
+    // Ruta para listar usuarios
+    if($uri == '/' || $uri == '/users') {
+        $controller = new UserController();
         $controller->index();
-        break;
-    case 'create':
+    // Ruta para mostrar el formulario de creación
+    } elseif($uri == '/users/create') {
+        $controller = new UserController();
         $controller->create();
-        break;
-    case 'store':
+    // Ruta para almacenar un usuario nuevo (POST)
+    } elseif($uri == '/users/store' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller = new UserController();
         $controller->store();
-        break;
-    case 'edit':
-        $controller->edit();
-        break;
-    case 'update':
+    // Ruta para mostrar el formulario de edición
+    } elseif(preg_match('#^/users/edit/(\d+)$#', $uri, $matches)) {
+        $controller = new UserController();
+        $controller->edit($matches[1]);
+    // Ruta para actualizar un usuario (POST)
+    } elseif($uri == '/users/update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller = new UserController();
         $controller->update();
-        break;
-    case 'delete':
-        $controller->delete();
-        break;
-    default:
-        echo "Acción no válida";
-        break;
+    // Ruta para mostrar detalles del usuario
+    } elseif(preg_match('#^/users/show/(\d+)$#', $uri, $matches)) {
+        $controller = new UserController();
+        $controller->show($matches[1]);
+    // Ruta para eliminar un usuario
+    } elseif(preg_match('#^/users/delete/(\d+)$#', $uri, $matches)) {
+        $controller = new UserController();
+        $controller->delete($matches[1]);
+    } else {
+        echo "404 Not Found";
+    }
 }
-?>

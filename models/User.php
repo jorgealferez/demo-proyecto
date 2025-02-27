@@ -1,67 +1,57 @@
 <?php
-// Modelo de Usuario que interactúa con la base de datos
-require_once 'config/database.php';
+// models/User.php
+// Modelo para el usuario con métodos CRUD usando PDO
 
 class User {
-    public $id;
-    public $name;
-    public $email;
-    
-    public function __construct($id, $name, $email){
-        $this->id = $id;
-        $this->name = $name;
-        $this->email = $email;
+    // Crea y retorna la conexión a la base de datos
+    private static function connect() {
+        $host = 'localhost';
+        $dbname = 'test';
+        $username = 'root';
+        $password = '';
+        
+        try {
+            $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $pdo;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
     }
-    
-    // Recupera todos los usuarios
+
+    // Retorna todos los usuarios
     public static function all() {
-        $conn = Database::getConnection();
-        $stmt = $conn->query("SELECT * FROM users");
-        $users = [];
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $users[] = new User($row['id'], $row['name'], $row['email']);
-        }
-        return $users;
+        $pdo = self::connect();
+        $stmt = $pdo->query("SELECT * FROM users");
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
-    
-    // Encuentra un usuario por su ID
+
+    // Busca un usuario por ID
     public static function find($id) {
-        $conn = Database::getConnection();
-        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if($row) {
-            return new User($row['id'], $row['name'], $row['email']);
-        }
-        return null;
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
-    
+
     // Crea un nuevo usuario
     public static function create($data) {
-        $conn = Database::getConnection();
-        $stmt = $conn->prepare("INSERT INTO users (name, email) VALUES (?, ?)");
-        $stmt->execute([
-            $data['name'],
-            $data['email']
-        ]);
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+        $stmt->execute([$data['name'], $data['email']]);
     }
-    
+
     // Actualiza un usuario existente
     public static function update($id, $data) {
-        $conn = Database::getConnection();
-        $stmt = $conn->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
-        $stmt->execute([
-            $data['name'],
-            $data['email'],
-            $id
-        ]);
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
+        $stmt->execute([$data['name'], $data['email'], $id]);
     }
-    
+
     // Elimina un usuario
     public static function delete($id) {
-        $conn = Database::getConnection();
-        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$id]);
     }
 }
-?>
