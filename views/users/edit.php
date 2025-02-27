@@ -4,22 +4,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>Editar Usuario</title>
 </head>
 <body>
     <h1>Editar Usuario</h1>
-    <form action="index.php?action=update" method="post">
-        <input type="hidden" name="id" value="<?php echo htmlspecialchars($user['id']); ?>">
-        <label>Nombre:</label>
-        <input type="text" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
-        <br><br>
-        <label>Email:</label>
-        <input type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
-        <br><br>
-        <button type="submit">Actualizar</button>
+    <?php if($user): ?>
+    <form action="index.php?action=update&id=<?php echo $user->id; ?>" method="post">
+        <p>
+            <label for="name">Nombre:</label>
+            <input type="text" name="name" value="<?php echo htmlspecialchars($user->name); ?>" required>
+        </p>
+        <p>
+            <label for="email">Email:</label>
+            <input type="email" name="email" value="<?php echo htmlspecialchars($user->email); ?>" required>
+        </p>
+        <p>
+            <button type="submit">Actualizar</button>
+        </p>
     </form>
-    <br>
-    <a href="index.php?action=index">Volver a la lista</a>
+    <?php else: ?>
+        <p>Usuario no encontrado.</p>
+    <?php endif; ?>
+    <a href="index.php?action=index">Volver</a>
 </body>
 </html>

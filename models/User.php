@@ -1,51 +1,67 @@
 <?php
-// Modelo User: contiene la lógica para interactuar con la tabla 'users'
+// Modelo de Usuario que interactúa con la base de datos
+require_once 'config/database.php';
 
 class User {
-    private $pdo;
-
-    public function __construct() {
-        // Utilizar la conexión PDO definida globalmente
-        global $pdo;
-        $this->pdo = $pdo;
+    public $id;
+    public $name;
+    public $email;
+    
+    public function __construct($id, $name, $email){
+        $this->id = $id;
+        $this->name = $name;
+        $this->email = $email;
     }
-
-    // Obtener todos los usuarios
-    public function all() {
-        $stmt = $this->pdo->query("SELECT * FROM users");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Recupera todos los usuarios
+    public static function all() {
+        $conn = Database::getConnection();
+        $stmt = $conn->query("SELECT * FROM users");
+        $users = [];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $users[] = new User($row['id'], $row['name'], $row['email']);
+        }
+        return $users;
     }
-
-    // Encontrar un usuario por su ID
-    public function find($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = ?");
+    
+    // Encuentra un usuario por su ID
+    public static function find($id) {
+        $conn = Database::getConnection();
+        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if($row) {
+            return new User($row['id'], $row['name'], $row['email']);
+        }
+        return null;
     }
-
-    // Crear un nuevo usuario
-    public function create($data) {
-        $stmt = $this->pdo->prepare("INSERT INTO users (name, email, created_at) VALUES (?, ?, NOW())");
-        return $stmt->execute([
+    
+    // Crea un nuevo usuario
+    public static function create($data) {
+        $conn = Database::getConnection();
+        $stmt = $conn->prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+        $stmt->execute([
             $data['name'],
             $data['email']
         ]);
     }
-
-    // Actualizar un usuario existente
-    public function update($id, $data) {
-        $stmt = $this->pdo->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
-        return $stmt->execute([
+    
+    // Actualiza un usuario existente
+    public static function update($id, $data) {
+        $conn = Database::getConnection();
+        $stmt = $conn->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
+        $stmt->execute([
             $data['name'],
             $data['email'],
             $id
         ]);
     }
-
-    // Eliminar un usuario
-    public function delete($id) {
-        $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = ?");
-        return $stmt->execute([$id]);
+    
+    // Elimina un usuario
+    public static function delete($id) {
+        $conn = Database::getConnection();
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
     }
 }
 ?>
