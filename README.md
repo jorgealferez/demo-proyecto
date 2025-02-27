@@ -1,5 +1,10 @@
-# CRUD de Usuarios
+<?php
+// Archivo: README.md
+// Se ha añadido el siguiente texto para indicar la nueva funcionalidad:
 
-Este proyecto permite gestionar usuarios a través de un CRUD completo. Se han implementado las operaciones básicas: crear, leer, actualizar y eliminar usuarios.
-
+/*
 hoja jorge
+*/
+
+// Fin de modificación
+?>
